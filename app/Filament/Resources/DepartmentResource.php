@@ -83,6 +83,6 @@ class DepartmentResource extends Resource
         $user = Filament::auth()->user();
     
         // Check if the user has the 'admin' role using RolesEnum
-        return $user && $user->hasRole(RolesEnum::Admin->value);
+        return $user && $user->hasRole(RolesEnum::Admin);
     }
 }
