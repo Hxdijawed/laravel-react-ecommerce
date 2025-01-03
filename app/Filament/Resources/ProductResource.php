@@ -3,15 +3,15 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Filament\Resources\ProductResource\Pages\EditProduct; // Corrected the namespace
+use App\Filament\Resources\ProductResource\Pages\ProductImages;
 use App\Models\Product;
 use App\ProductStatusEnum;
-use App\RolesEnum; // Added missing semicolon here
-use Illuminate\Support\Str; // Import for slug generation
+use App\RolesEnum; 
+use Illuminate\Support\Str; 
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
@@ -19,12 +19,17 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Actions;
+use Filament\Pages\Page;
+use Filament\Pages\SubNavigationPosition; // Corrected import
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    // Corrected the property definition and set it to SubNavigationPosition::End
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::End;
 
     public static function form(Forms\Form $form): Forms\Form
     {
@@ -56,7 +61,7 @@ class ProductResource extends Resource
                                 name: 'category',
                                 titleAttribute: 'name',
                                 modifyQueryUsing: function (Builder $query, callable $get) {
-                                    $departmentId = $get('department_id'); // Fix missing semicolon here
+                                    $departmentId = $get('department_id');
                                     if ($departmentId) {
                                         $query->where('department_id', $departmentId); // Filter categories by department
                                     }
@@ -96,9 +101,9 @@ class ProductResource extends Resource
                     ->columnSpan(2),
                 TextInput::make('price')
                     ->required()
-                    ->numeric(), // Ensuring that price is a numeric input
+                    ->numeric(),
                 TextInput::make('quantity')
-                    ->integer(), // Corrected typo here from inetregar() to integer()
+                    ->integer(),
                 Select::make('status')
                     ->options(ProductStatusEnum::labels())
                     ->default(ProductStatusEnum::Draft->value)
@@ -116,7 +121,7 @@ class ProductResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->colors(ProductStatusEnum::colors()), // Fixed badge color usage
+                    ->colors(ProductStatusEnum::colors()), 
                 Tables\Columns\TextColumn::make('department.name')
                     ->label(__('Department'))
                     ->sortable()
@@ -126,10 +131,10 @@ class ProductResource extends Resource
                     ->dateTime()
             ])
             ->filters([ 
-                selectFilter::make('status')
-                ->options(ProductStatusEnum::labels()),
-                selectFilter::make('department_id')
-                ->relationship('department','name'),
+                SelectFilter::make('status')
+                    ->options(ProductStatusEnum::labels()),
+                SelectFilter::make('department_id')
+                    ->relationship('department', 'name'),
              ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -152,15 +157,21 @@ class ProductResource extends Resource
             'index' => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'images' => Pages\ProductImages::route('/{record}/images'),
         ];
+    }
+
+    public static function getRecordSubNavigation(Page $page): array
+    {
+        return $page->generateNavigationItems([
+            EditProduct::class,
+            ProductImages::class,
+        ]);
     }
 
     public static function canViewAny(): bool
     {
-        // Get the currently authenticated user
         $user = Filament::auth()->user();
-    
-        // Check if the user has the 'admin' role using RolesEnum
         return $user && $user->hasRole(RolesEnum::Vendor);
     }
 }
