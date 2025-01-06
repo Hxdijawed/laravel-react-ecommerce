@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
-use App\Filament\Resources\ProductResource; // Ensure this points to the correct ProductResource
+use App\Filament\Resources\ProductResource; // Correct namespace for the ProductResource
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Forms\Form;
@@ -11,17 +11,17 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 class ProductImages extends EditRecord
 {
     protected static string $resource = ProductResource::class;
+    protected static ?string $navigationIcon ='heroicon-c-photo';
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                SpatieMediaLibraryFileUpload::make('image')
+                SpatieMediaLibraryFileUpload::make('images') // Corrected to match the collection name
                     ->image()
-                    ->openable()
                     ->multiple()
                     ->panelLayout('grid')
-                    ->collection('images')
+                    ->collection('images') // Ensure this matches your media collection
                     ->reorderable()
                     ->appendFiles()
                     ->preserveFilenames()
@@ -32,7 +32,7 @@ class ProductImages extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make(), // Action to delete the record
         ];
     }
 }

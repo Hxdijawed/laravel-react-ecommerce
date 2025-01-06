@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Actions;
 use Filament\Pages\Page;
 use Filament\Pages\SubNavigationPosition; // Corrected import
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
 class ProductResource extends Resource
 {
@@ -115,6 +116,11 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
+                 SpatieMediaLibraryImageColumn::make('images')
+                 ->collection('images')
+                 ->limit(1)
+                 ->label('Image')
+                 ->conversion('thumb'),
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->words(10)
